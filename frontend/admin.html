@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Administração - Catálogo</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body>
+    <h1>Administração do Catálogo</h1>
+
+    <!-- Login -->
+    <div id="login">
+        <h2>Login Admin</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="senha" placeholder="Senha">
+        <button onclick="login()">Entrar</button>
+        <p id="login-msg"></p>
+    </div>
+
+    <!-- Área de Administração -->
+  <div id="admin-area" style="display:none;">
+    <h2>Adicionar Produto</h2>
+    <input type="text" id="nome" placeholder="Nome">
+    <input type="text" id="descricao" placeholder="Descrição">
+    <input type="number" id="preco" placeholder="Preço">
+    <select id="categoria-prod">
+        <option value="roupas">Roupas</option>
+        <option value="perfumes">Perfumes</option>
+    </select>
+    
+    <input type="file" id="imagem" onchange="previewImage(event)"> 
+    
+    <div id="image-preview-container" style="display:none; margin-top: 15px; border: 1px solid #ddd; padding: 10px; border-radius: 5px; text-align: center;">
+        <img id="image-preview" src="" alt="Pré-visualização da Imagem" style="max-width: 100%; max-height: 200px; display: block; margin: 0 auto 10px auto; border-radius: 3px;">
+        <button type="button" onclick="removeImage()">Remover Imagem</button>
+    </div>
+
+    <button onclick="adicionarProduto()">Adicionar</button>
+    <p id="add-msg"></p>
+
+    <h2>Produtos Cadastrados</h2>
+    <div id="produtos-admin"></div>
+</div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

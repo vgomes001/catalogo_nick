@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Produtos</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    
+    <style>
+        /* Container flutuante no canto inferior direito */
+        #admin-float-button {
+            position: fixed; /* Fixa na tela */
+            bottom: 20px; /* 20px acima do rodapé */
+            right: 20px; /* 20px à esquerda da lateral */
+            z-index: 1000; /* Garante que fique acima de outros elementos */
+        }
+
+        /* Estilo do botão/ícone discreto */
+        #admin-float-button button {
+            background-color: rgba(0, 0, 0, 0.4); /* Fundo semi-transparente */
+            color: white;
+            border-radius: 50%; /* Torna o botão redondo */
+            width: 45px;
+            height: 45px;
+            padding: 0;
+            font-size: 1.5em; /* Tamanho do ícone/texto */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        #admin-float-button button:hover {
+            background-color: rgba(0, 0, 0, 0.6); /* Fundo menos transparente no hover */
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <h1>Catálogo de Produtos</h1>
+
+    <select id="categoria" onchange="listarProdutos()">
+        <option value="">Todas</option>
+        <option value="roupas">Roupas</option>
+        <option value="perfumes">Perfumes</option>
+    </select>
+
+    <div id="produtos"></div>
+
+    <div id="admin-float-button">
+        <button onclick="window.location.href='admin.html'">⚙️</button> 
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
