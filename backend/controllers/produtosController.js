@@ -45,6 +45,40 @@ exports.adicionarProduto = (req, res) => {
     );
 };
 
+// rota
+router.put("/:id", authMiddleware, upload.single('imagem'), produtosController.editarProduto);
+
+// controller
+exports.editarProduto = (req, res) => {
+    if (req.user.tipo !== "admin") return res.status(403).json({ message: "Não autorizado" });
+
+    const { id } = req.params;
+    const { nome, descricao, preco, categoria } = req.body;
+    const novaImagem = req.file ? req.file.filename : null;
+
+    // Pega imagem antiga
+    connection.query("SELECT imagem FROM produtos WHERE id = ?", [id], (err, results) => {
+        if (err) return res.status(500).json(err);
+        if (results.length === 0) return res.status(404).json({ message: "Produto não encontrado" });
+
+        const imagemAntiga = results[0].imagem;
+
+        const sql = "UPDATE produtos SET nome=?, descricao=?, preco=?, categoria=?, imagem=? WHERE id=?";
+        const params = [nome, descricao, preco, categoria, novaImagem || imagemAntiga, id];
+
+        connection.query(sql, params, (err2) => {
+            if (err2) return res.status(500).json(err2);
+
+            // Se houver nova imagem, deletar a antiga
+            if (novaImagem && imagemAntiga) fs.unlink(`uploads/${imagemAntiga}`, (unlinkErr) => {
+                if (unlinkErr) console.error("Erro ao deletar imagem antiga:", unlinkErr);
+            });
+
+            res.json({ message: "Produto atualizado com sucesso!" });
+        });
+    });
+};
+
 // REMOVER PRODUTO (somente admin)
 exports.removerProduto = (req, res) => {
     if (req.user.tipo !== "admin")

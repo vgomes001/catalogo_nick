@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo de Produtos - Bella Store</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body>
+    <header id="catalogo-header">
+        <h1 class="store-name">Bella Store</h1>
+        <p class="tagline">Seu Catálogo de Produtos Exclusivos</p>
+    </header>
+
+    <select id="categoria" onchange="listarProdutos()">
+        <option value="">Todas</option>
+        <option value="roupas">Roupas</option>
+        <option value="perfumes">Perfumes</option>
+    </select>
+
+    <div id="produtos"></div>
+
+    <script src="js/produtos.js"></script>
+</body>
+</html>

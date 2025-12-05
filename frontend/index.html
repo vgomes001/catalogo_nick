@@ -3,27 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Produtos</title>
+    <title>Bella Store - Catálogo</title>
     <link rel="stylesheet" href="styles/styles.css">
     
     <style>
-        /* Container flutuante no canto inferior direito */
+        /* (O código CSS flutuante do botão de Admin permanece aqui) */
         #admin-float-button {
-            position: fixed; /* Fixa na tela */
-            bottom: 20px; /* 20px acima do rodapé */
-            right: 20px; /* 20px à esquerda da lateral */
-            z-index: 1000; /* Garante que fique acima de outros elementos */
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            z-index: 1000; 
         }
 
-        /* Estilo do botão/ícone discreto */
         #admin-float-button button {
-            background-color: rgba(0, 0, 0, 0.4); /* Fundo semi-transparente */
+            background-color: rgba(0, 0, 0, 0.4); 
             color: white;
-            border-radius: 50%; /* Torna o botão redondo */
+            border-radius: 50%; 
             width: 45px;
             height: 45px;
             padding: 0;
-            font-size: 1.5em; /* Tamanho do ícone/texto */
+            font-size: 1.5em; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -32,19 +31,23 @@
         }
 
         #admin-float-button button:hover {
-            background-color: rgba(0, 0, 0, 0.6); /* Fundo menos transparente no hover */
+            background-color: rgba(0, 0, 0, 0.6); 
             transform: scale(1.05);
         }
     </style>
 </head>
 <body>
-    <h1>Catálogo de Produtos</h1>
+    <header id="catalogo-header">
+        <h1 class="store-name">Bella Store</h1>
+        <p class="tagline">Seu Catálogo de Produtos Exclusivos</p>
+    </header>
 
     <select id="categoria" onchange="listarProdutos()">
         <option value="">Todas</option>
         <option value="roupas">Roupas</option>
         <option value="perfumes">Perfumes</option>
     </select>
+
 
     <div id="produtos"></div>
 

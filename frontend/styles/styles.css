@@ -1,5 +1,5 @@
-/* Importação de fontes (opcional, mas recomendado para um bom visual) */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+/* Importação de fontes para um visual mais elegante */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:wght@300;400;700&display=swap');
 
 /* Estilos Globais */
 body {
@@ -17,14 +17,49 @@ h1, h2, h3 {
     font-weight: 700;
 }
 
+/* --- ESTILOS DO NOVO HEADER ESTILIZADO (Nome da Loja) --- */
+
+#catalogo-header {
+    text-align: center;
+    margin-bottom: 40px; /* Mais espaço abaixo do header */
+    padding: 20px 0;
+    background-color: #ffffff; /* Fundo branco no header */
+    border-bottom: 5px solid #d4af37; /* Linha sutil para elegância (cor dourada/ouro) */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.store-name {
+    font-family: 'Playfair Display', serif; /* Fonte elegante */
+    font-size: 3.8em; /* Tamanho maior */
+    color: #333333; /* Cor escura elegante */
+    margin: 0 0 5px 0; /* Ajusta a margem */
+    letter-spacing: 2px; /* Aumenta o espaçamento entre as letras */
+    text-transform: uppercase; /* Deixa em caixa alta para um visual marcante */
+    font-weight: 700;
+    /* Sombra sutil para dar profundidade */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); 
+}
+
+.tagline {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.1em;
+    color: #777;
+    margin-top: 0;
+    font-style: italic;
+}
+
+/* Estilo do h1 genérico (se não estiver dentro de #catalogo-header) */
 h1 {
+    /* Ajustado para evitar conflito com .store-name */
     text-align: center;
     font-size: 2.5em;
     color: #4a4a4a;
     margin-bottom: 30px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 15px;
+    /* A borda foi movida para #catalogo-header */
+    padding-bottom: 0; 
 }
+
+/* --- RESTO DOS ESTILOS --- */
 
 /* Botões */
 button {
@@ -181,6 +216,12 @@ select {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 15px;
     }
+    .store-name {
+        font-size: 2.5em; /* Reduz o tamanho do título em telas menores */
+    }
+    .tagline {
+        font-size: 1em;
+    }
     h1 {
         font-size: 2em;
     }
@@ -191,4 +232,82 @@ select {
         margin: 20px auto;
         padding: 20px;
     }
+}
+
+.modal {
+    display: none; /* Oculto por padrão */
+    position: fixed; /* Fixado na tela */
+    z-index: 2000; /* Garante que fique acima de tudo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.7); /* Fundo preto semi-transparente */
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 5% do topo e centralizado */
+    padding: 30px;
+    border: 1px solid #888;
+    width: 80%; /* Pode ajustar a largura */
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Estilos para as labels no modal para organização */
+.modal-content label {
+    display: block;
+    text-align: left;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: 700;
+    color: #555;
+}
+
+/* Garante que os inputs dentro do modal tenham largura total */
+.modal-content input[type="text"],
+.modal-content input[type="number"],
+.modal-content select {
+    width: 100%;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }

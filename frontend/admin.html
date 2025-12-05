@@ -1,47 +1,101 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Administração - Catálogo</title>
-    <link rel="stylesheet" href="styles/styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administração - Catálogo Bella Store</title>
+<link rel="stylesheet" href="styles/styles.css">
+<style>
+    /* Modal e previews */
+    .modal { display:none; position: fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);}
+    .modal-content { background-color:#fff; margin:10% auto; padding:20px; border-radius:5px; width:90%; max-width:500px;}
+    .close-button { float:right; font-size:1.5em; cursor:pointer;}
+    #produtos-admin .produto { border:1px solid #ddd; padding:10px; margin-bottom:10px; border-radius:4px;}
+    #produtos-admin .produto img { max-width:150px; display:block; margin-bottom:10px;}
+    button { cursor:pointer;}
+    .success-msg { color:green; font-weight:bold;}
+    #admin-menu button { margin-right:10px; padding:5px 10px;}
+</style>
 </head>
 <body>
-    <h1>Administração do Catálogo</h1>
+<h1>Administração do Catálogo</h1>
 
-    <!-- Login -->
-    <div id="login">
-        <h2>Login Admin</h2>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="senha" placeholder="Senha">
-        <button onclick="login()">Entrar</button>
-        <p id="login-msg"></p>
-    </div>
-
-    <!-- Área de Administração -->
-  <div id="admin-area" style="display:none;">
-    <h2>Adicionar Produto</h2>
-    <input type="text" id="nome" placeholder="Nome">
-    <input type="text" id="descricao" placeholder="Descrição">
-    <input type="number" id="preco" placeholder="Preço">
-    <select id="categoria-prod">
-        <option value="roupas">Roupas</option>
-        <option value="perfumes">Perfumes</option>
-    </select>
-    
-    <input type="file" id="imagem" onchange="previewImage(event)"> 
-    
-    <div id="image-preview-container" style="display:none; margin-top: 15px; border: 1px solid #ddd; padding: 10px; border-radius: 5px; text-align: center;">
-        <img id="image-preview" src="" alt="Pré-visualização da Imagem" style="max-width: 100%; max-height: 200px; display: block; margin: 0 auto 10px auto; border-radius: 3px;">
-        <button type="button" onclick="removeImage()">Remover Imagem</button>
-    </div>
-
-    <button onclick="adicionarProduto()">Adicionar</button>
-    <p id="add-msg"></p>
-
-    <h2>Produtos Cadastrados</h2>
-    <div id="produtos-admin"></div>
+<!-- LOGIN -->
+<div id="login">
+    <h2>Login de Admin</h2>
+    <input type="email" id="email" placeholder="Email"><br><br>
+    <input type="password" id="senha" placeholder="Senha"><br><br>
+    <button onclick="login()">Entrar</button>
+    <p id="login-msg"></p>
 </div>
 
-    <script src="js/admin.js"></script>
+<!-- ÁREA DE ADMIN -->
+<div id="admin-area" style="display:none;">
+
+    <!-- MENU INICIAL -->
+    <div id="admin-menu-inicial">
+        <h2>Escolha uma opção:</h2>
+        <button onclick="showSection('add-product-section')">Adicionar Produto</button>
+        <button onclick="showSection('list-products-section')">Visualizar Produtos</button>
+    </div>
+
+    <!-- ADICIONAR PRODUTO -->
+    <div id="add-product-section" style="display:none;">
+        <h2>Adicionar Produto</h2>
+        <input type="text" id="nome" placeholder="Nome"><br><br>
+        <input type="text" id="descricao" placeholder="Descrição"><br><br>
+        <input type="number" id="preco" placeholder="Preço"><br><br>
+        <select id="categoria-prod">
+            <option value="roupas">Roupas</option>
+            <option value="perfumes">Perfumes</option>
+        </select><br><br>
+        <input type="file" id="imagem" onchange="previewImage()"><br><br>
+        <div id="image-preview-container" style="display:none;">
+            <p>Preview:</p>
+            <img id="image-preview" src="" alt="Preview">
+        </div>
+        <button onclick="adicionarProduto()">Adicionar Produto</button>
+        <button onclick="showSection('admin-menu-inicial')">Voltar</button>
+        <p id="add-msg"></p>
+    </div>
+
+    <!-- LISTAR PRODUTOS -->
+    <div id="list-products-section" style="display:none;">
+        <h2>Produtos Cadastrados</h2>
+        <div id="produtos-admin"></div>
+        <button onclick="showSection('admin-menu-inicial')">Voltar</button>
+    </div>
+
+</div>
+
+<!-- MODAL DE EDIÇÃO -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeEditModal()">&times;</span>
+        <h2>Editar Produto</h2>
+        <input type="hidden" id="edit-id">
+        <label for="edit-nome">Nome:</label>
+        <input type="text" id="edit-nome" placeholder="Nome"><br><br>
+        <label for="edit-descricao">Descrição:</label>
+        <input type="text" id="edit-descricao" placeholder="Descrição"><br><br>
+        <label for="edit-preco">Preço:</label>
+        <input type="number" id="edit-preco" placeholder="Preço"><br><br>
+        <label for="edit-categoria">Categoria:</label>
+        <select id="edit-categoria">
+            <option value="roupas">Roupas</option>
+            <option value="perfumes">Perfumes</option>
+        </select><br><br>
+        <label for="edit-imagem">Nova Imagem (opcional):</label>
+        <input type="file" id="edit-imagem" onchange="previewEditImage()"><br><br>
+        <div id="current-image-container">
+            <p>Imagem Atual:</p>
+            <img id="current-image" src="" alt="Imagem Atual">
+        </div>
+        <button onclick="salvarEdicao()">Salvar Alterações</button>
+        <p id="edit-msg" class="success-msg"></p>
+    </div>
+</div>
+
+<script src="js/admin.js"></script>
 </body>
 </html>

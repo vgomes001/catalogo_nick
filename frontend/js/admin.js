@@ -1,11 +1,12 @@
 let token = "";
 const API_URL = "http://localhost:3000";
 
-// LOGIN
+// ==========================
+//      LOGIN ADMIN
+// ==========================
 function login() {
     const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
-
     document.getElementById("login-msg").innerText = "Tentando entrar...";
 
     fetch(`${API_URL}/usuarios/login`, {
@@ -14,39 +15,47 @@ function login() {
         body: JSON.stringify({ email, senha })
     })
     .then(res => {
-        // 1. Trata a resposta HTTP antes de extrair o JSON
         if (!res.ok) {
-            // Se o status for ruim (400, 401, 500), tenta extrair a mensagem de erro do backend
             return res.json().then(data => {
-                const message = data.message || `Erro de rede/servidor (${res.status})`;
-                document.getElementById("login-msg").innerText = message;
-                // Lança um erro para pular o próximo .then()
-                throw new Error(message); 
+                const msg = data.message || `Erro HTTP ${res.status}`;
+                document.getElementById("login-msg").innerText = msg;
+                throw new Error(msg);
             });
         }
-        // Se a resposta for OK (200), prossegue
         return res.json();
     })
     .then(data => {
-        // Sucesso no login
         token = data.token;
         document.getElementById("login-msg").innerText = "Login bem-sucedido!";
         document.getElementById("login").style.display = "none";
         document.getElementById("admin-area").style.display = "block";
+        showSection('admin-menu-inicial'); // Exibe cadastro inicialmente
         listarProdutosAdmin();
     })
     .catch(err => {
-        // Erros de rede (fetch failed) ou erros lançados acima
-        if (err.message && !document.getElementById("login-msg").innerText.includes("Erro")) {
-             document.getElementById("login-msg").innerText = err.message;
-        } else if (!err.message) {
-            document.getElementById("login-msg").innerText = "Falha ao conectar ao servidor.";
+        if (!document.getElementById("login-msg").innerText.includes("Erro")) {
+            document.getElementById("login-msg").innerText = err.message || "Falha na conexão";
         }
-        console.error("Erro no login:", err);
+        console.error("Erro login:", err);
     });
 }
 
-// LISTAR PRODUTOS PARA ADMIN
+// ==========================
+//      GERENCIAR SEÇÕES
+// ==========================
+function showSection(sectionId) {
+    const sections = ['add-product-section', 'list-products-section'];
+    sections.forEach(sec => document.getElementById(sec).style.display = 'none');
+
+    const section = document.getElementById(sectionId);
+    if (section) section.style.display = 'block';
+
+    if (sectionId === 'list-products-section') listarProdutosAdmin();
+}
+
+// ==========================
+//      LISTAR PRODUTOS
+// ==========================
 function listarProdutosAdmin() {
     fetch(`${API_URL}/produtos`, {
         headers: { "Authorization": `Bearer ${token}` }
@@ -55,13 +64,10 @@ function listarProdutosAdmin() {
     .then(data => {
         const container = document.getElementById("produtos-admin");
         container.innerHTML = "";
-        
-        // Verifica se a resposta contém uma mensagem de erro (caso o token expire)
+
         if (data.message && data.message.includes("Token")) {
-             container.innerHTML = `<p style="color:red;">Sessão expirada ou não autorizado. Por favor, faça login novamente.</p>`;
-             console.error("Sessão expirada.");
-             // Poderia forçar o logout aqui se quisesse
-             return;
+            container.innerHTML = `<p style="color:red;">Sessão expirada. Faça login novamente.</p>`;
+            return;
         }
 
         data.forEach(p => {
@@ -73,6 +79,7 @@ function listarProdutosAdmin() {
                 <p>${p.descricao}</p>
                 <p>R$ ${p.preco}</p>
                 <p>Categoria: ${p.categoria}</p>
+                <button onclick="openEditModal(${JSON.stringify(p)})">Editar</button>
                 <button onclick="removerProduto(${p.id})">Remover</button>
             `;
             container.appendChild(div);
@@ -81,7 +88,9 @@ function listarProdutosAdmin() {
     .catch(err => console.error("Erro ao listar produtos admin:", err));
 }
 
-// ADICIONAR PRODUTO
+// ==========================
+//      ADICIONAR PRODUTO
+// ==========================
 function adicionarProduto() {
     const formData = new FormData();
     formData.append("nome", document.getElementById("nome").value);
@@ -95,40 +104,35 @@ function adicionarProduto() {
 
     fetch(`${API_URL}/produtos`, {
         method: "POST",
-        // Ao enviar FormData, o Content-Type não é definido manualmente
-        headers: { "Authorization": `Bearer ${token}` }, 
+        headers: { "Authorization": `Bearer ${token}` }, // sem Content-Type para FormData
         body: formData
     })
     .then(res => {
         if (!res.ok) {
             return res.json().then(data => {
-                const message = data.message || `Erro ao adicionar (${res.status})`;
-                document.getElementById("add-msg").innerText = message;
-                // Lança um erro para ser capturado no catch
-                throw new Error(message); 
+                const msg = data.message || `Erro HTTP ${res.status}`;
+                document.getElementById("add-msg").innerText = msg;
+                throw new Error(msg);
             });
         }
         return res.json();
     })
     .then(data => {
-        // Sucesso
         document.getElementById("add-msg").innerText = data.message;
-        
-        // Limpa os campos
+        // Limpar campos
         document.getElementById("nome").value = "";
         document.getElementById("descricao").value = "";
         document.getElementById("preco").value = "";
         document.getElementById("imagem").value = "";
-        
-        listarProdutosAdmin();
+        removeImage();
+        showSection('list-products-section');
     })
-    .catch(err => {
-        // Erro já foi exibido, apenas loga no console
-        console.error("Erro ao adicionar produto:", err);
-    });
+    .catch(err => console.error("Erro ao adicionar produto:", err));
 }
 
-// REMOVER PRODUTO
+// ==========================
+//      REMOVER PRODUTO
+// ==========================
 function removerProduto(id) {
     if (!confirm("Tem certeza que deseja remover este produto?")) return;
 
@@ -139,8 +143,8 @@ function removerProduto(id) {
     .then(res => {
         if (!res.ok) {
             return res.json().then(data => {
-                alert(data.message || `Erro ao remover: ${res.status}`);
-                throw new Error(data.message || `Erro HTTP ${res.status}`);
+                alert(data.message || `Erro HTTP ${res.status}`);
+                throw new Error(data.message);
             });
         }
         return res.json();
@@ -149,39 +153,103 @@ function removerProduto(id) {
         alert(data.message);
         listarProdutosAdmin();
     })
-    .catch(err => console.error("Erro ao remover:", err));
+    .catch(err => console.error("Erro ao remover produto:", err));
 }
 
-function previewImage(event) {
-    const reader = new FileReader();
-    const inputImagem = document.getElementById("imagem");
+// ==========================
+//      PREVIEW DE IMAGEM
+// ==========================
+function previewImage() {
+    const input = document.getElementById("imagem");
     const previewContainer = document.getElementById("image-preview-container");
-    const previewImageElement = document.getElementById("image-preview");
+    const previewImg = document.getElementById("image-preview");
 
-    if (inputImagem.files.length > 0) {
-        // Define o que acontece quando o leitor termina de carregar
-        reader.onload = function(){
-            previewImageElement.src = reader.result;
-            previewContainer.style.display = 'block'; // Exibe o container
+    if (input.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            previewImg.src = reader.result;
+            previewContainer.style.display = 'block';
         };
-        
-        // Lê o arquivo como uma URL de dados (base64)
-        reader.readAsDataURL(inputImagem.files[0]);
-    } else {
-        removeImage(); // Caso a seleção seja cancelada
-    }
+        reader.readAsDataURL(input.files[0]);
+    } else removeImage();
 }
 
 function removeImage() {
-    const inputImagem = document.getElementById("imagem");
+    document.getElementById("imagem").value = "";
     const previewContainer = document.getElementById("image-preview-container");
-    const previewImageElement = document.getElementById("image-preview");
-
-    // Limpa o valor do input file (importante para o FormData não enviar nada)
-    inputImagem.value = ""; 
-
-    // Oculta e limpa a pré-visualização
-    previewImageElement.src = "";
-    previewContainer.style.display = 'none'; 
+    const previewImg = document.getElementById("image-preview");
+    previewImg.src = "";
+    previewContainer.style.display = 'none';
 }
 
+// ==========================
+//      MODAL DE EDIÇÃO
+// ==========================
+function openEditModal(produto) {
+    document.getElementById('edit-id').value = produto.id;
+    document.getElementById('edit-nome').value = produto.nome;
+    document.getElementById('edit-descricao').value = produto.descricao;
+    document.getElementById('edit-preco').value = produto.preco;
+    document.getElementById('edit-categoria').value = produto.categoria;
+    document.getElementById('current-image').src = produto.imagem ? `${API_URL}/uploads/${produto.imagem}` : 'https://via.placeholder.com/150';
+    document.getElementById('edit-modal').style.display = 'block';
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').style.display = 'none';
+    document.getElementById('edit-msg').textContent = '';
+}
+
+function previewEditImage() {
+    const input = document.getElementById("edit-imagem");
+    const previewImg = document.getElementById("current-image");
+
+    if (input.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = () => previewImg.src = reader.result;
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function salvarEdicao() {
+    const id = document.getElementById('edit-id').value;
+    const nome = document.getElementById('edit-nome').value;
+    const descricao = document.getElementById('edit-descricao').value;
+    const preco = document.getElementById('edit-preco').value;
+    const categoria = document.getElementById('edit-categoria').value;
+    const novaImagem = document.getElementById('edit-imagem').files[0];
+    const editMsg = document.getElementById('edit-msg');
+
+    if (!nome || !descricao || !preco) {
+        editMsg.textContent = 'Preencha todos os campos obrigatórios.';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("nome", nome);
+    formData.append("descricao", descricao);
+    formData.append("preco", preco);
+    formData.append("categoria", categoria);
+    if (novaImagem) formData.append("imagem", novaImagem);
+
+    fetch(`${API_URL}/produtos/${id}`, {
+        method: "PUT",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+    })
+    .then(res => {
+        if (!res.ok) {
+            return res.json().then(data => {
+                editMsg.textContent = data.message || `Erro HTTP ${res.status}`;
+                throw new Error(editMsg.textContent);
+            });
+        }
+        return res.json();
+    })
+    .then(data => {
+        editMsg.textContent = 'Produto atualizado com sucesso!';
+        listarProdutosAdmin();
+        setTimeout(closeEditModal, 1500);
+    })
+    .catch(err => console.error("Erro ao editar produto:", err));
+}
